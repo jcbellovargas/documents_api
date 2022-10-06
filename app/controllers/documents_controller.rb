@@ -9,10 +9,10 @@ class DocumentsController < ApplicationController
     else 
       render json: response.error
     end
-    
   end
 
   def get
 
   end
+
 end
