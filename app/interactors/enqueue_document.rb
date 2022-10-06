@@ -10,7 +10,6 @@ class EnqueueDocument
     begin
       RabbitSender.publish(context.message, PRINT_DOCS_QUEUE)
     rescue => e
-      # binding.pry
       context.fail!(error: "Error adding message to queue - #{e.message}")
     end
   end
