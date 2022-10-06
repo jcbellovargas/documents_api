@@ -1,21 +1,52 @@
 #!/usr/bin/env ruby
 require 'bunny'
+require "pry"
+require 'json'
 
-connection = Bunny.new
-connection.start
+@connection = Bunny.new
+@connection.start
 
-channel = connection.create_channel
-queue = channel.queue('test queue')
+@channel = @connection.create_channel
+@documents_queue = @channel.queue('documents')
+@printed_queue = @channel.queue('printed')
+
+def create_print_message(doc)
+  {status: "OK", print_datetime: DateTime.now, document: doc}
+end
+
+def enqueue_print_response(message)
+  @channel.default_exchange.publish(message.to_json, routing_key: @printed_queue.name)
+end
+
+def send_to_printer(doc)
+  puts " [>] Printing #{doc}"
+  sleep 5
+  print = true
+  if print
+    puts " [>] #{doc} successfully printed"
+    message = create_print_message(doc)
+    enqueue_print_response(message)
+    
+  else
+    puts " [X] ERROR printing #{doc}"
+  end
+end
+
+def read_documents_queue
+  @documents_queue.subscribe do |_delivery_info, _properties, body|
+    puts " [!] Received #{body}"
+    document = JSON.parse(body)["document"]
+    send_to_printer(document)
+  end
+end
 
 begin
   puts ' [*] Waiting for messages. To exit press CTRL+C'
-  # block: true is only used to keep the main thread
-  # alive. Please avoid using it in real world applications.
-  queue.subscribe(block: true) do |_delivery_info, _properties, body|
-    puts " [x] Received #{body}"
+  loop do
+    read_documents_queue
   end
 rescue Interrupt => _
-  connection.close
+  @connection.close
 
   exit(0)
 end

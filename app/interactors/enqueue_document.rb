@@ -3,7 +3,7 @@ require "./app/services/rabbit_sender"
 class EnqueueDocument
   include Interactor
 
-  PRINT_DOCS_QUEUE = "print"
+  PRINT_DOCS_QUEUE = "documents"
 
   def call
     context.message = {document: context.document, priority: context.priority}
