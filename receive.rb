@@ -22,13 +22,17 @@ def print_successful
   rand(1..3) > 1
 end
 
+def report_successful_print(doc)
+  puts " [>] #{doc} successfully printed"
+  message = create_print_message(doc)
+  enqueue_print_response(message)
+end
+
 def send_to_printer(doc)
   puts " [>] Printing #{doc}"
   sleep 3
   if print_successful
-    puts " [>] #{doc} successfully printed"
-    message = create_print_message(doc)
-    enqueue_print_response(message)
+    report_successful_print(doc)
   else
     puts " [X] ERROR printing #{doc}"
   end
