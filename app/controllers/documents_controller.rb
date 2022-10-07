@@ -11,8 +11,13 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def get
-
+  def show
+    response = GetDocument.call(params)
+    if response.success?
+      render json: response.document.as_json
+    else 
+      render json: response.error
+    end
   end
 
 end
