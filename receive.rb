@@ -11,7 +11,7 @@ require 'json'
 @printed_queue = @channel.queue('printed')
 
 def create_print_message(doc)
-  {status: "OK", print_datetime: DateTime.now, document: doc}
+  {status: "OK", print_timestamp: DateTime.now, document: doc}
 end
 
 def enqueue_print_response(message)
@@ -39,7 +39,7 @@ def send_to_printer(doc)
 end
 
 def read_documents_queue
-  @documents_queue.subscribe do |_delivery_info, _properties, body|
+  @documents_queue.subscribe(block: true) do |_delivery_info, _properties, body|
     puts " [!] Received #{body}"
     document = JSON.parse(body)["document"]
     send_to_printer(document)
@@ -48,9 +48,7 @@ end
 
 begin
   puts ' [*] Waiting for messages. To exit press CTRL+C'
-  loop do
-    read_documents_queue
-  end
+  read_documents_queue
 rescue Interrupt => _
   @connection.close
   exit(0)
