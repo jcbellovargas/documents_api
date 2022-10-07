@@ -6,7 +6,7 @@ class GetDocument
     begin
       context.document = redis.get(context.document_name)
       if context.document.blank?
-
+        raise "Document not found"
       end
     rescue => e
       context.fail!(error: "Error retrieving data from Redis - #{e.message}")

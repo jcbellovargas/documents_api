@@ -7,7 +7,7 @@ class DocumentsController < ApplicationController
     if response.success?
       render json: response.message.as_json
     else 
-      render json: response.error
+      render json: {status: "ERROR", message: response.error }
     end
   end
 
@@ -16,7 +16,7 @@ class DocumentsController < ApplicationController
     if response.success?
       render json: response.document.as_json
     else 
-      render json: response.error
+      render json: {status: "ERROR", message: response.error }
     end
   end
 
