@@ -1,6 +1,7 @@
 require 'bunny'
 require 'pry'
 require 'json'
+require 'redis'
 
 desc "Read from Printed queue and save to DB"
 task :read_prints do
@@ -9,19 +10,25 @@ task :read_prints do
   @connection.start
   @channel = @connection.create_channel
   @printed_queue = @channel.queue('printed')
+  @redis = Redis.new(host: "localhost")
 
   def save(result)
-    puts "Saving #{result} to Redis"
+    @redis.set(result[:document_name], result.to_json)
+  end
+
+  def parse_print_payload(message)
+    payload = JSON.parse(message)
+    {
+      document_name:  payload["document"],
+      print_timestamp: payload["print_timestamp"],
+      save_timestamp:  DateTime.now 
+    }
   end
 
   def read_printed_queue
     @printed_queue.subscribe(block: true) do |_delivery_info, _properties, message|
-      payload = JSON.parse(message)
-      print_result = {
-        document_name:  payload["document"],
-        print_datetime: payload["print_datetime"],
-        save_datetime:  DateTime.now 
-      }
+      sleep 1
+      print_result = parse_print_payload(message)
       save(print_result)
     end
   end
