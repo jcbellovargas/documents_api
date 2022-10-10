@@ -47,7 +47,7 @@ def read_documents_queue
 end
 
 begin
-  puts ' [*] Waiting for messages. To exit press CTRL+C'
+  puts " [*] Waiting for '#{@documents_queue.name}' messages. To exit press CTRL+C"
   read_documents_queue
 rescue Interrupt => _
   @connection.close
