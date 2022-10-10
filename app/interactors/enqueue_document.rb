@@ -6,7 +6,7 @@ class EnqueueDocument
   PRINT_DOCS_QUEUE = "documents"
 
   def call
-    context.message = {document: context.document, priority: context.priority}
+    context.message = {document: context.document, priority: context.priority.to_i}
     begin
       RabbitSender.publish(context.message, PRINT_DOCS_QUEUE)
     rescue => e

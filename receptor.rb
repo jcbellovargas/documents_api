@@ -7,7 +7,7 @@ require 'json'
 @connection.start
 @channel = @connection.create_channel
 
-@documents_queue = @channel.queue('documents')
+@documents_queue = @channel.queue('documents', arguments: { "x-max-priority" => 10 } )
 @printed_queue = @channel.queue('printed')
 
 def create_print_message(doc)
