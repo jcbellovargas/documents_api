@@ -11,6 +11,7 @@ require 'redis'
 
 def save(result)
   @redis.set(result[:document_name], result.to_json)
+  puts " [>] #{result.to_json} saved to DB"
 end
 
 def parse_print_payload(message)
@@ -24,7 +25,7 @@ end
 
 def read_printed_queue
   @printed_queue.subscribe(block: true) do |_delivery_info, _properties, message|
-
+    puts " [!] Received #{message}"
     sleep 1
     print_result = parse_print_payload(message)
     save(print_result)
